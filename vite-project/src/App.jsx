@@ -1,10 +1,11 @@
 import "./App.css";
-import { ChatComponents } from "./components/chatComponents";
+import { ChatComponent } from "./components/ChatComponent";
+import { SendingHook } from "./components/SendingHook";
 
 function App() {
   return (
     <div>
-      <ChatComponents />
+      <ChatComponent />
     </div>
   );
 }
