@@ -5,7 +5,7 @@ export function ChatComponent() {
   const { messageList, actualMessage, onInputChange, error, onSend } =
     UseChat();
   return (
-    <div>
+    <div className="chat-box">
       <p className="sent-message">Ciao,come stai?</p>
       <p className="received-message">Ehy ciao, tutto bene grazie, tu?</p>
       <p className="sent-message">Molto bene, come stano andando le vacanze?</p>
