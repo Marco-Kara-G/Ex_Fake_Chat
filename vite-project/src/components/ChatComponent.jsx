@@ -1,31 +1,73 @@
-import { SendingHook } from "./SendingHook";
-import { UseChat } from "./UseChat";
+import { useState } from "react";
+import { UseFetchAPI } from "./FetchAPI";
 
-export function ChatComponent() {
-  const { messageList, actualMessage, onInputChange, error, onSend } =
-    UseChat();
+export function ChatComponents() {
+  const { messages, error, loading, onNewMessage } = UseFetchAPI();
+
+  const [messageList, setMessageList] = useState([]); // Cronologia messaggi
+  const [actualMessage, setActualMessage] = useState(""); // Messaggio attuale
+
+  // Funzione per gestire il cambiamento dell'input
+  const handleMessageChange = (event) => {
+    setActualMessage(event.target.value);
+  };
+
+  // Funzione per inviare un messaggio
+  const onSending = async (e) => {
+    e.preventDefault();
+
+    if (!actualMessage.trim()) return; // Non inviare messaggi vuoti
+
+    // Aggiungi il messaggio dell'utente alla lista
+    const userMessage = { from: "user", text: actualMessage };
+    setMessageList((prev) => [...prev, userMessage]);
+
+    // Estrai la risposta corrispondente dal backend
+    const botResponse =
+      messages?.responses?.[actualMessage] || "Risposta non trovata";
+
+    // Aggiungi la risposta del bot alla lista
+    const botMessage = { from: "bot", text: botResponse };
+    setMessageList((prev) => [...prev, botMessage]);
+
+    // Pulisci l'input
+    setActualMessage("");
+  };
+
   return (
-    <div className="chat-box">
-      <p className="sent-message">Ciao,come stai?</p>
-      <p className="received-message">Ehy ciao, tutto bene grazie, tu?</p>
-      <p className="sent-message">Molto bene, come stano andando le vacanze?</p>
-      <p className="received-message">
-        sono stato in montagna e poi al mare, tu? che hai fatto?
-      </p>
-      {messageList.map((mess, index) => (
-        <p
-          key={index}
-          className={index % 2 === 0 ? "sent-message" : "received-message"}
-        >
-          {mess}
-        </p>
-      ))}
-      <SendingHook
-        actualMessage={actualMessage}
-        onInputChange={onInputChange}
-        onSend={onSend}
-        error={error}
-      />
+    <div>
+      <div>
+        <input
+          type="text"
+          name="messageInp"
+          id="messageInp"
+          value={actualMessage}
+          onChange={handleMessageChange}
+          placeholder="Scrivi il tuo messaggio"
+        />
+        <button onClick={onSending} disabled={loading}>
+          {loading ? "Invio in corso..." : "Invia Messaggio"}
+        </button>
+      </div>
+
+      {error && <p>Errore: {error}</p>}
+
+      <div>
+        <h3>Chat</h3>
+        <div>
+          {messageList.map((msg, index) => (
+            <div
+              key={index}
+              style={{ textAlign: msg.from === "user" ? "right" : "left" }}
+            >
+              <p>
+                <strong>{msg.from === "user" ? "Utente" : "Bot"}:</strong>{" "}
+                {msg.text}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
